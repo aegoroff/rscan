@@ -18,7 +18,10 @@ pub fn execute() {
     for entry in WalkDir::new(path).follow_links(false) {
         let e = entry.unwrap();
         if e.file_type.is_file() {
-            total_size += e.metadata().unwrap().len();
+            match e.metadata() {
+                Ok(m) => total_size += m.len(),
+                Err(_) => {}
+            }
             files += 1;
         } else {
             folders += 1;
