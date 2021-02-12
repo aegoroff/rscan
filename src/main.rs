@@ -11,6 +11,4 @@ fn main() {
     } else if mode == "s" {
         rscan::execute_single(path);
     }
-
-
 }

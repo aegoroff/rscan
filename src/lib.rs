@@ -12,15 +12,15 @@ pub fn execute_single(path: &str) {
     let mut folders: i64 = 0;
     let mut total_size: u64 = 0;
     for entry in WalkDir::new(path).follow_links(false) {
-        let e = entry.unwrap();
-        if e.file_type().is_file() {
-            match e.metadata() {
-                Ok(m) => total_size += m.len(),
-                Err(_) => {}
+        if let Ok(e) = entry {
+            if e.file_type().is_file() {
+                if let Ok(m) = e.metadata() {
+                    total_size += m.len()
+                }
+                files += 1;
+            } else {
+                folders += 1;
             }
-            files += 1;
-        } else {
-            folders += 1;
         }
     }
     println!(
@@ -39,15 +39,15 @@ pub fn execute_parallel(path: &str) {
     let mut folders: i64 = 0;
     let mut total_size: u64 = 0;
     for entry in jwalk::WalkDir::new(path).follow_links(false) {
-        let e = entry.unwrap();
-        if e.file_type().is_file() {
-            match e.metadata() {
-                Ok(m) => total_size += m.len(),
-                Err(_) => {}
+        if let Ok(e) = entry {
+            if e.file_type().is_file() {
+                if let Ok(m) = e.metadata() {
+                    total_size += m.len()
+                }
+                files += 1;
+            } else {
+                folders += 1;
             }
-            files += 1;
-        } else {
-            folders += 1;
         }
     }
     println!(
