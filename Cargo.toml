@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 jwalk = "0.5"
 humantime = "2.1"
+walkdir = "2"
