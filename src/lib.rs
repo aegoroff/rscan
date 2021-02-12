@@ -3,16 +3,18 @@ use std::collections::VecDeque;
 use std::fs;
 use std::io;
 use std::time::Instant;
+use size_format::{SizeFormatterBinary};
 
 extern crate humantime;
 extern crate jwalk;
+extern crate size_format;
 
 pub fn execute_single(path: &str) {
     let now = Instant::now();
 
     let mut files: i64 = 0;
     let mut folders: i64 = 0;
-    let total_size: u64 = 0;
+    let mut total_size: u64 = 0;
 
     let mut vector: VecDeque<String> = VecDeque::new();
     vector.push_back(String::from(path));
@@ -20,7 +22,7 @@ pub fn execute_single(path: &str) {
     loop {
         if let Some(p) = vector.pop_front() {
             folders += 1;
-            match read_dir(&mut vector, &p, &mut files) {
+            match read_dir(&mut vector, &p, &mut files, &mut total_size) {
                 Err(e) => println!("{} path: {}", e, p),
                 Ok(_) => {}
             }
@@ -30,22 +32,26 @@ pub fn execute_single(path: &str) {
     }
 
     println!(
-        "files: {} folders: {} size: {} elapsed: {}",
+        "files: {} folders: {} size: {}B elapsed: {}",
         files,
         folders,
-        total_size,
+        SizeFormatterBinary::new(total_size),
         humantime::format_duration(now.elapsed()).to_string()
     );
 }
 
-fn read_dir(vector: &mut VecDeque<String>, path: &str, f: &mut i64) -> io::Result<()> {
+fn read_dir(vector: &mut VecDeque<String>, path: &str, f: &mut i64, t: &mut u64) -> io::Result<()> {
     for entry in fs::read_dir(path)? {
         let entry = entry?;
         let full = entry.path().into_os_string().into_string().unwrap();
         if entry.path().is_dir() {
             vector.push_back(full);
         } else {
-            *f += 1;
+            let m = entry.metadata()?;
+            if m.is_file() {
+                *t += m.len();
+                *f += 1;
+            }
         }
     }
     Ok(())
@@ -70,10 +76,10 @@ pub fn execute_parallel(path: &str) {
         }
     }
     println!(
-        "files: {} folders: {} size: {} elapsed: {}",
+        "files: {} folders: {} size: {}B elapsed: {}",
         files,
         folders,
-        total_size,
+        SizeFormatterBinary::new(total_size),
         humantime::format_duration(now.elapsed()).to_string()
     );
 }
