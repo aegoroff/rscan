@@ -18,15 +18,14 @@ pub fn execute_single(path: &str) {
     vector.push_back(String::from(path));
 
     loop {
-        if vector.is_empty() {
-            break;
-        } else {
-            let p = vector.pop_front().unwrap();
+        if let Some(p) = vector.pop_front() {
             folders += 1;
             match read_dir(&mut vector, &p, &mut files) {
                 Err(e) => println!("{} path: {}", e, p),
                 Ok(_) => {}
             }
+        } else {
+            break;
         }
     }
 
