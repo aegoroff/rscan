@@ -1,6 +1,7 @@
 use jwalk::WalkDir;
 use std::collections::VecDeque;
 use std::fs;
+use std::io;
 use std::time::Instant;
 
 extern crate humantime;
@@ -22,7 +23,10 @@ pub fn execute_single(path: &str) {
         } else {
             let p = vector.pop_front().unwrap();
             folders += 1;
-            read_dir(&mut vector, &p, &mut files);
+            match read_dir(&mut vector, &p, &mut files) {
+                Err(e) => println!("{} path: {}", e, p),
+                Ok(_) => {}
+            }
         }
     }
 
@@ -35,9 +39,9 @@ pub fn execute_single(path: &str) {
     );
 }
 
-fn read_dir(vector: &mut VecDeque<String>, path: &str, f: &mut i64) {
-    for entry in fs::read_dir(path).unwrap() {
-        let entry = entry.unwrap();
+fn read_dir(vector: &mut VecDeque<String>, path: &str, f: &mut i64) -> io::Result<()> {
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
         let full = entry.path().into_os_string().into_string().unwrap();
         if entry.path().is_dir() {
             vector.push_back(full);
@@ -45,6 +49,7 @@ fn read_dir(vector: &mut VecDeque<String>, path: &str, f: &mut i64) {
             *f += 1;
         }
     }
+    Ok(())
 }
 
 pub fn execute_parallel(path: &str) {
