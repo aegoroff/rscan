@@ -1,6 +1,7 @@
-use std::time::Instant;
-use std::fs;
+use jwalk::WalkDir;
 use std::collections::VecDeque;
+use std::fs;
+use std::time::Instant;
 
 extern crate humantime;
 extern crate jwalk;
@@ -17,7 +18,7 @@ pub fn execute_single(path: &str) {
 
     loop {
         if vector.is_empty() {
-           break;
+            break;
         } else {
             let p = vector.pop_front().unwrap();
             folders += 1;
@@ -52,7 +53,7 @@ pub fn execute_parallel(path: &str) {
     let mut files: i64 = 0;
     let mut folders: i64 = 0;
     let mut total_size: u64 = 0;
-    for entry in jwalk::WalkDir::new(path).skip_hidden(false).follow_links(false) {
+    for entry in WalkDir::new(path).skip_hidden(false).follow_links(false) {
         if let Ok(e) = entry {
             if e.file_type().is_file() {
                 if let Ok(m) = e.metadata() {
