@@ -39,10 +39,8 @@ fn read_dir(vector: &mut VecDeque<String>, path: &str, f: &mut i64) {
         let entry = entry.unwrap();
         let full = entry.path().into_os_string().into_string().unwrap();
         if entry.path().is_dir() {
-            //visit_dirs(&path, cb).;
             vector.push_back(full);
         } else {
-            //println!("{}", full);
             *f += 1;
         }
     }
