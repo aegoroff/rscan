@@ -18,7 +18,7 @@ pub fn execute_single(path: &str) {
                     total_size += m.len()
                 }
                 files += 1;
-            } else {
+            } else if e.file_type().is_dir() {
                 folders += 1;
             }
         }
@@ -45,7 +45,7 @@ pub fn execute_parallel(path: &str) {
                     total_size += m.len()
                 }
                 files += 1;
-            } else {
+            } else if e.file_type().is_dir() {
                 folders += 1;
             }
         }
