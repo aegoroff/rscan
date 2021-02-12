@@ -14,18 +14,21 @@ pub fn execute() {
 
     let mut files: i64 = 0;
     let mut folders: i64 = 0;
-    for entry in WalkDir::new(path) {
+    let mut total_size: u64 = 0;
+    for entry in WalkDir::new(path).follow_links(false) {
         let e = entry.unwrap();
-        if e.file_type().is_dir() {
-            folders += 1;
-        } else {
+        if e.file_type.is_file() {
+            total_size += e.metadata().unwrap().len();
             files += 1;
+        } else {
+            folders += 1;
         }
     }
     println!(
-        "files: {} folders: {} elapsed: {}",
+        "files: {} folders: {} size: {} elapsed: {}",
         files,
         folders,
+        total_size,
         humantime::format_duration(now.elapsed()).to_string()
     );
 }
